@@ -1,0 +1,22 @@
+{
+  "_source": "Recorded from sensor.nfl_tampa_bay_buccaneers on 2026-10-11 (TeamTracker, ESPN). Trimmed to the attributes the plugin reads.",
+  "status": "available",
+  "state": "POST",
+  "lastChanged": "2026-10-12T01:03:16.482408+00:00",
+  "attributes": {
+    "state": "POST",
+    "sport": "football",
+    "league_path": "nfl",
+    "team_abbr": "TB",
+    "opponent_abbr": "DAL",
+    "event_name": "TB @ DAL",
+    "date": "2026-10-09T00:15Z",
+    "kickoff_in": "3 days ago",
+    "team_homeaway": "away",
+    "team_score": "24",
+    "opponent_score": "16",
+    "clock": "Final",
+    "quarter": 4,
+    "friendly_name": "NFL - Tampa Bay Buccaneers"
+  }
+}

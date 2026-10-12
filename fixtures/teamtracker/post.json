@@ -1,0 +1,21 @@
+{
+  "_source": "SYNTHETIC: pre.json at full time. Replace with a recording from the 2026-10-17 match.",
+  "status": "available",
+  "state": "POST",
+  "lastChanged": "2026-10-18T01:24:40+00:00",
+  "attributes": {
+    "state": "POST",
+    "sport": "soccer",
+    "league_path": "usa.usl.1",
+    "team_abbr": "TBR",
+    "opponent_abbr": "DET",
+    "event_name": "DET @ TBR",
+    "date": "2026-10-17T23:30Z",
+    "kickoff_in": null,
+    "team_homeaway": "home",
+    "team_score": "2",
+    "opponent_score": "1",
+    "clock": "FT",
+    "friendly_name": "Tampa Bay Rowdies"
+  }
+}

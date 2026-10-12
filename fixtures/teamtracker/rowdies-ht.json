@@ -1,0 +1,21 @@
+{
+  "_source": "Recorded from sensor.tampa_bay_rowdies on 2026-10-10 (TeamTracker, ESPN usa.usl.1, TBR v INDY, from HA history). Trimmed to the attributes the plugin reads.",
+  "state": "IN",
+  "status": "available",
+  "lastChanged": "2026-10-10T19:55:17.204712-04:00",
+  "attributes": {
+    "state": "IN",
+    "sport": "soccer",
+    "league_path": "usa.usl.1",
+    "team_abbr": "TBR",
+    "opponent_abbr": "INDY",
+    "event_name": "TBR @ INDY",
+    "date": "2026-10-10T23:00Z",
+    "kickoff_in": "55 minutes ago",
+    "team_homeaway": "away",
+    "team_score": "0",
+    "opponent_score": "1",
+    "clock": "HT",
+    "friendly_name": "Tampa Bay Rowdies"
+  }
+}

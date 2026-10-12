@@ -1,0 +1,22 @@
+{
+  "_source": "Recorded from sensor.nhl_tampa_bay_lightning on 2026-10-11 (TeamTracker, ESPN). Trimmed to the attributes the plugin reads.",
+  "status": "available",
+  "state": "PRE",
+  "lastChanged": "2026-10-12T01:02:38.518835+00:00",
+  "attributes": {
+    "state": "PRE",
+    "sport": "hockey",
+    "league_path": "nhl",
+    "team_abbr": "TB",
+    "opponent_abbr": "NYR",
+    "event_name": "TB @ NYR",
+    "date": "2026-10-13T23:15Z",
+    "kickoff_in": "in a day",
+    "team_homeaway": "away",
+    "team_score": null,
+    "opponent_score": null,
+    "clock": "10/13 - 7:15 PM EDT",
+    "quarter": 0,
+    "friendly_name": "NHL - Tampa Bay Lightning"
+  }
+}

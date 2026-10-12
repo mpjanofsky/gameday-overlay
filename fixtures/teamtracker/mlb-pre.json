@@ -1,0 +1,22 @@
+{
+  "_source": "Recorded from sensor.mlb_tampa_bay_rays on 2026-10-11 (TeamTracker, ESPN). Trimmed to the attributes the plugin reads.",
+  "status": "available",
+  "state": "PRE",
+  "lastChanged": "2026-10-12T01:02:12.683566+00:00",
+  "attributes": {
+    "state": "PRE",
+    "sport": "baseball",
+    "league_path": "mlb",
+    "team_abbr": "TB",
+    "opponent_abbr": "CLE",
+    "event_name": "CLE @ TB",
+    "date": "2026-10-13T00:00Z",
+    "kickoff_in": "in 22 hours",
+    "team_homeaway": "home",
+    "team_score": null,
+    "opponent_score": null,
+    "clock": "10/12 - 8:00 PM EDT",
+    "quarter": 1,
+    "friendly_name": "MLB - Tampa Bay Rays"
+  }
+}

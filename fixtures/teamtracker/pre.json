@@ -1,0 +1,21 @@
+{
+  "_source": "Recorded from sensor.tampa_bay_rowdies on 2026-10-11 (TeamTracker, ESPN usa.usl.1). Trimmed to the attributes the plugin reads.",
+  "status": "available",
+  "state": "PRE",
+  "lastChanged": "2026-10-11T15:22:07.640995+00:00",
+  "attributes": {
+    "state": "PRE",
+    "sport": "soccer",
+    "league_path": "usa.usl.1",
+    "team_abbr": "TBR",
+    "opponent_abbr": "DET",
+    "event_name": "DET @ TBR",
+    "date": "2026-10-17T23:30Z",
+    "kickoff_in": "in 6 days",
+    "team_homeaway": "home",
+    "team_score": null,
+    "opponent_score": null,
+    "clock": "10/17 - 7:30 PM EDT",
+    "friendly_name": "Tampa Bay Rowdies"
+  }
+}

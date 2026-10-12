@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "id": "gameday",
+  "name": "Gameday",
+  "version": "0.5.0",
+  "apiVersion": 1,
+  "minAndroidSdk": 24,
+  "entryClass": "io.github.mpjanofsky.kiosk.gameday.GamedayPlugin",
+  "description": "A small live score bar for your team's game, drawn over the kiosk. Reads a TeamTracker sensor from Home Assistant.",
+  "author": "Mike Janofsky",
+  "license": "Apache-2.0",
+  "capabilities": [
+    "overlay",
+    "host.read"
+  ],
+  "settings": [
+    {
+      "key": "teamEntity",
+      "title": "Team sensor",
+      "type": "entity",
+      "default": "",
+      "group": "Team",
+      "description": "The TeamTracker sensor for your team, e.g. sensor.tampa_bay_rowdies."
+    },
+    {
+      "key": "preGameHours",
+      "title": "Show upcoming game (hours before)",
+      "type": "number",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "default": 3,
+      "group": "Team",
+      "description": "How long before the start the bar appears with the start time. 0 shows it only once the game starts."
+    },
+    {
+      "key": "finalMinutes",
+      "title": "Keep final score (minutes)",
+      "type": "number",
+      "min": 0,
+      "max": 240,
+      "step": 5,
+      "default": 30,
+      "group": "Team",
+      "description": "How long the final score stays up after the game ends. 0 hides the bar at the end of the game."
+    },
+    {
+      "key": "position",
+      "title": "Position",
+      "type": "select",
+      "options": [
+        "Top",
+        "Bottom",
+        "Top left",
+        "Top right",
+        "Bottom left",
+        "Bottom right"
+      ],
+      "default": "Top",
+      "group": "Display"
+    },
+    {
+      "key": "style",
+      "title": "Style",
+      "type": "select",
+      "options": [
+        "Crests",
+        "Text"
+      ],
+      "default": "Crests",
+      "description": "Crests shows each team's logo in its colors. Text shows abbreviations tinted in team colors.",
+      "group": "Display"
+    },
+    {
+      "key": "goalStyle",
+      "title": "Goal confetti",
+      "type": "select",
+      "options": [
+        "Shower",
+        "Drift",
+        "Sparkle"
+      ],
+      "default": "Shower",
+      "description": "How the confetti plays after the ball lands: falling across the bar, drifting out of the badge, or twinkling stars.",
+      "group": "Display"
+    },
+    {
+      "key": "size",
+      "title": "Size",
+      "type": "select",
+      "options": [
+        "Small",
+        "Medium",
+        "Large"
+      ],
+      "default": "Medium",
+      "group": "Display"
+    },
+    {
+      "key": "overScreensaver",
+      "title": "Show over the screensaver",
+      "type": "boolean",
+      "default": true,
+      "group": "Display",
+      "description": "Draw over the screensaver, the menu and camera views. Notifications and announcements still cover the bar."
+    },
+    {
+      "key": "preview",
+      "title": "Preview",
+      "type": "select",
+      "options": [
+        "Off",
+        "Upcoming game",
+        "Live",
+        "Final",
+        "Final (loss)",
+        "Goal demo",
+        "Sport tour"
+      ],
+      "default": "Off",
+      "group": "Display",
+      "description": "Show sample data to try the position and size. Turn off for normal use."
+    }
+  ]
+}

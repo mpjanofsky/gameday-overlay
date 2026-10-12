@@ -1,0 +1,15 @@
+# Personal, never committed: device addresses, admin credentials (.local/LOCAL.md)
+
+# Build output
+dist/
+__pycache__/
+*.pyc
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Claude Code per-user settings
+.claude/settings.local.json
+.local/

@@ -1,0 +1,84 @@
+{
+ "sports": [
+  {
+   "leagues": [
+    {
+     "teams": [
+      {
+       "team": {
+        "abbreviation": "DET",
+        "displayName": "Detroit City FC",
+        "color": "643335",
+        "alternateColor": "D69A2D",
+        "logos": [
+         {
+          "href": "https://a.espncdn.com/i/teamlogos/soccer/500/19179.png",
+          "rel": [
+           "full",
+           "default"
+          ]
+         },
+         {
+          "href": "https://a.espncdn.com/i/teamlogos/soccer/500-dark/19179.png",
+          "rel": [
+           "full",
+           "dark"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "team": {
+        "abbreviation": "PIT",
+        "displayName": "Pittsburgh Riverhounds",
+        "color": "e8d035",
+        "alternateColor": "000000",
+        "logos": [
+         {
+          "href": "https://a.espncdn.com/i/teamlogos/soccer/500/17827.png",
+          "rel": [
+           "full",
+           "default"
+          ]
+         },
+         {
+          "href": "https://a.espncdn.com/i/teamlogos/soccer/500-dark/17827.png",
+          "rel": [
+           "full",
+           "dark"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "team": {
+        "abbreviation": "TBR",
+        "displayName": "Tampa Bay Rowdies",
+        "color": "09bc0c",
+        "alternateColor": "f2ee07",
+        "logos": [
+         {
+          "href": "https://a.espncdn.com/i/teamlogos/soccer/500/17361.png",
+          "rel": [
+           "full",
+           "default"
+          ]
+         },
+         {
+          "href": "https://a.espncdn.com/i/teamlogos/soccer/500-dark/17361.png",
+          "rel": [
+           "full",
+           "dark"
+          ]
+         }
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
