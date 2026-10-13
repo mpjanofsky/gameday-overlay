@@ -25,7 +25,7 @@ announcements still cover it while they're up.
 | Sport | Supported | Tested |
 | --- | :---: | :---: |
 | Soccer | ✅ | ✅ |
-| Baseball | ✅ | |
+| Baseball | ✅ | ✅ |
 | Hockey | ✅ | |
 | Football | ✅ | |
 | Basketball | ✅ | |
