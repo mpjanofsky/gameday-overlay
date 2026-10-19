@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.github.mpjanofsky.kiosk.gameday;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -11,8 +15,8 @@ import me.jxl.kiosk.plugins.OverlaySpec;
 import me.jxl.kiosk.plugins.PluginHost;
 
 /**
- * Follows one TeamTracker sensor and keeps a small bar over the kiosk in
- * step with the match. Entity events carry score and clock changes. A
+ * Follows up to six TeamTracker sensors and keeps a small bar over the kiosk in
+ * step with one of their matches (Pick says which). Entity events carry score and clock changes. A
  * 30-second tick covers what no event announces: the pre-game window
  * opening, the countdown, and the final score's hold running out.
  *
@@ -22,6 +26,13 @@ import me.jxl.kiosk.plugins.PluginHost;
 public final class GamedayPlugin implements KioskPlugin {
     static final String KEY = "bug";
     private static final long TICK_SECONDS = 30;
+    /**
+     * 0.5 kept teams in three pickers; 0.6 keeps them in the "teams" list. The manifest still declares the pickers,
+     * always hidden, so an upgraded kiosk hands over what they held and configure moves it into the list.
+     */
+    private static final String[] LEGACY_KEYS = {"teamEntity", "team2Entity", "team3Entity"};
+    /** The list's maxItems. Three pickers and the old three rows fit, so the move never drops a team. */
+    private static final int SLOTS = 6;
 
     private final LongSupplier clock;
     private final boolean ticking;
@@ -30,7 +41,14 @@ public final class GamedayPlugin implements KioskPlugin {
     private PluginHost host;
     private ScheduledExecutorService tick;
 
-    private String entity = "";
+    /** Per team slot: the sensor, its latest status and its match. An empty entity is an unused slot. */
+    private final String[] entities = new String[SLOTS];
+    private final String[] entityStatuses = new String[SLOTS];
+    private final Match[] matches = new Match[SLOTS];
+    /** Per team slot: what the bar would show for it right now. Pick chooses among them. */
+    private final Display[] candidates = new Display[SLOTS];
+    /** The slot whose match is on the bar, or -1. Pick holds it until it drops out or a higher rank appears. */
+    private int shownSlot = -1;
     private int preGameHours = 3;
     private int finalMinutes = 30;
     private String anchor = OverlaySpec.TOP;
@@ -42,8 +60,6 @@ public final class GamedayPlugin implements KioskPlugin {
     private boolean demoArmed;
     private long previewSince;
 
-    private Match match;
-    private String entityStatus = "connecting";
     private boolean unsupported;
     private BugOverlay overlay;
     /** The spec the bar is shown with, or null while it is hidden. A change of spec replaces the overlay. */
@@ -52,6 +68,12 @@ public final class GamedayPlugin implements KioskPlugin {
     private int generation;
     private Display last = Display.HIDDEN;
     private String lastStatus;
+
+    {
+        Arrays.fill(entities, "");
+        Arrays.fill(entityStatuses, "connecting");
+        Arrays.fill(candidates, Display.HIDDEN);
+    }
 
     public GamedayPlugin() { this(System::currentTimeMillis, true, BrandStore::httpGet); }
 
@@ -91,14 +113,24 @@ public final class GamedayPlugin implements KioskPlugin {
         String nextPreview = text(settings, "preview", "Off");
         if (!nextPreview.equals(preview)) previewSince = clock.getAsLong();
         preview = nextPreview;
-        String next = text(settings, "teamEntity", "");
-        if (!next.equals(entity)) {
-            if (!entity.isEmpty()) host.unsubscribe("ha.entity." + entity);
-            entity = next;
-            match = null;
-            entityStatus = "connecting";
+        List<String> teams = teams(settings);
+        boolean legacy = false;
+        for (String key : LEGACY_KEYS) legacy |= !text(settings, key, "").isEmpty();
+        if (legacy) moveToList(settings, teams);
+        String[] next = new String[SLOTS];
+        for (int i = 0; i < SLOTS; i++) next[i] = i < teams.size() ? teams.get(i) : "";
+        // Unsubscribe every changed slot before subscribing, so a sensor moved to another slot is subscribed afresh.
+        for (int i = 0; i < SLOTS; i++) {
+            if (next[i].equals(entities[i])) continue;
+            if (!entities[i].isEmpty()) host.unsubscribe("ha.entity." + entities[i]);
+            matches[i] = null;
+            entityStatuses[i] = "connecting";
+        }
+        for (int i = 0; i < SLOTS; i++) {
+            if (next[i].equals(entities[i])) continue;
+            entities[i] = next[i];
             // The subscription delivers the current state first, so there is no separate read.
-            if (!entity.isEmpty()) host.subscribe("ha.entity." + entity);
+            if (!next[i].isEmpty()) host.subscribe("ha.entity." + next[i]);
         }
         refresh();
         armDemo();
@@ -107,13 +139,23 @@ public final class GamedayPlugin implements KioskPlugin {
     @Override public void execute(String command, Map<String, Object> arguments) {}
 
     @Override public synchronized void onEvent(String event, Map<String, Object> payload) {
-        if (host == null || entity.isEmpty() || !event.equals("ks.ha.entity." + entity)) return;
+        if (host == null) return;
+        int slot = slotOf(event);
+        if (slot < 0) return;
         Object status = payload.get("status");
-        entityStatus = status instanceof String ? (String) status : "unknown";
+        String entityStatus = status instanceof String ? (String) status : "unknown";
+        entityStatuses[slot] = entityStatus;
         // A dropped HA connection clears attributes but says nothing about the match. Keep the last
         // known one so a reconnect mid-match does not blink the bar off; the time bounds still apply.
-        if (!"connecting".equals(entityStatus) && !"disconnected".equals(entityStatus)) match = Match.from(payload);
+        if (!"connecting".equals(entityStatus) && !"disconnected".equals(entityStatus)) matches[slot] = Match.from(payload);
         refresh();
+    }
+
+    private int slotOf(String event) {
+        for (int i = 0; i < SLOTS; i++) {
+            if (!entities[i].isEmpty() && event.equals("ks.ha.entity." + entities[i])) return i;
+        }
+        return -1;
     }
 
     /** KS revokes the host and removes overlays before stop, so only our own thread is cleaned up. */
@@ -126,8 +168,13 @@ public final class GamedayPlugin implements KioskPlugin {
         host = null;
         overlay = null;
         shownSpec = null;
-        match = null;
-        entity = "";
+        for (int i = 0; i < SLOTS; i++) {
+            matches[i] = null;
+            entities[i] = "";
+            entityStatuses[i] = "connecting";
+        }
+        Arrays.fill(candidates, Display.HIDDEN);
+        shownSlot = -1;
         last = Display.HIDDEN;
         lastStatus = null;
     }
@@ -169,10 +216,19 @@ public final class GamedayPlugin implements KioskPlugin {
         if (host == null) return;
         long now = clock.getAsLong();
         boolean live = "Off".equals(preview);
-        Display d = live ? BugState.decide(match, now, preGameHours, finalMinutes) : sample(preview, now);
+        Display d;
+        if (live) {
+            for (int i = 0; i < SLOTS; i++) candidates[i] = BugState.decide(matches[i], now, preGameHours, finalMinutes);
+            shownSlot = Pick.choose(candidates, shownSlot);
+            d = shownSlot < 0 ? Display.HIDDEN : candidates[shownSlot];
+        } else {
+            shownSlot = -1;
+            d = sample(preview, now);
+        }
         if (d.visible()) {
-            // The preview's sample teams are Rowdies v Detroit City, so they use the USL list.
-            String sport = live ? match.sport : previewSport(now), league = live ? match.league : "usa.usl.1";
+            // The preview's sample teams are Rowdies v Detroit City, so they use the USL list. A visible live display has a match.
+            Match shown = live ? matches[shownSlot] : null;
+            String sport = live ? shown.sport : previewSport(now), league = live ? shown.league : "usa.usl.1";
             d = brands == null ? d.decorated(null, null, sport) : d.decorated(brands.get(sport, league, d.left), brands.get(sport, league, d.right), sport);
         }
         String spec = anchor + "|" + textSp + "|" + onTop + "|" + style;
@@ -255,22 +311,50 @@ public final class GamedayPlugin implements KioskPlugin {
             error = true;
         } else if (!"Off".equals(preview)) {
             message = "Preview. " + d.summary();
-        } else if (entity.isEmpty()) {
-            message = "Choose your team's TeamTracker sensor.";
+        } else if (configured() == 0) {
+            message = "Add your team's TeamTracker sensor under Teams.";
             error = true;
-        } else if (match == null) {
-            message = entity + ": " + entityStatus;
-            error = !"connecting".equals(entityStatus);
-        } else if (d.visible()) {
-            message = d.summary();
-        } else if (Match.PRE.equals(match.state) && match.eventName != null) {
-            message = "Upcoming game " + match.eventName + (match.kickoffIn == null ? "" : ", " + match.kickoffIn);
         } else {
-            message = "No match showing (" + match.state + ")";
+            int failing = failing();
+            if (failing >= 0) {
+                message = entities[failing] + ": " + entityStatuses[failing];
+                error = true;
+            } else {
+                message = overview(d);
+            }
         }
         if (message.equals(lastStatus)) return;
         lastStatus = message;
         host.status(message, error);
+    }
+
+    private int configured() {
+        int n = 0;
+        for (String entity : entities) if (!entity.isEmpty()) n++;
+        return n;
+    }
+
+    /** The first team whose sensor reports a problem (not just a connection still opening) and has no match, or -1. */
+    private int failing() {
+        for (int i = 0; i < SLOTS; i++) {
+            if (!entities[i].isEmpty() && matches[i] == null && !"connecting".equals(entityStatuses[i])) return i;
+        }
+        return -1;
+    }
+
+    /**
+     * The bar's game, as in a single-team setup. With nothing on the bar, the first team in rank order that has a match
+     * says what is coming; a team still connecting has nothing to say yet, so it is skipped.
+     */
+    private String overview(Display d) {
+        if (d.visible()) return d.summary();
+        for (int i = 0; i < SLOTS; i++) {
+            Match m = matches[i];
+            if (entities[i].isEmpty() || m == null) continue;
+            if (Match.PRE.equals(m.state) && m.eventName != null) return "Upcoming game " + m.eventName + (m.kickoffIn == null ? "" : ", " + m.kickoffIn);
+            return "No match showing (" + m.state + ")";
+        }
+        return "Waiting for " + (configured() == 1 ? "the team sensor" : "the team sensors") + ".";
     }
 
     private static final String[] TOUR = {"soccer", "baseball", "hockey", "football"};
@@ -323,6 +407,49 @@ public final class GamedayPlugin implements KioskPlugin {
             case "Small": return 13;
             case "Large": return 21;
             default: return 16;
+        }
+    }
+
+    /**
+     * The sensors to follow, in rank order: any legacy pickers, then the list's rows. Empty and repeated sensors are
+     * dropped (a repeat would only compete with itself for the bar), and anything past SLOTS.
+     */
+    static List<String> teams(Map<String, Object> settings) {
+        List<String> sensors = new ArrayList<>();
+        for (String key : LEGACY_KEYS) sensors.add(text(settings, key, ""));
+        Object rows = settings.get("teams");
+        if (rows instanceof List) {
+            for (Object row : (List<?>) rows) {
+                Object sensor = row instanceof Map ? ((Map<?, ?>) row).get("sensor") : null;
+                if (sensor instanceof String) sensors.add((String) sensor);
+            }
+        }
+        List<String> teams = new ArrayList<>();
+        for (String sensor : sensors) if (!sensor.isEmpty() && !teams.contains(sensor) && teams.size() < SLOTS) teams.add(sensor);
+        return teams;
+    }
+
+    /**
+     * Saves the merged teams as the list and clears the pickers, so the list is the one place to edit them. KS may
+     * call configure again with the saved values; that pass finds no pickers and the same teams in the same slots.
+     * saveSettings takes the whole set (a key left out goes back to its default), so every other value is passed through.
+     */
+    private void moveToList(Map<String, Object> settings, List<String> teams) {
+        List<Map<String, Object>> rows = new ArrayList<>();
+        for (String sensor : teams) {
+            Map<String, Object> row = new HashMap<>();
+            row.put("sensor", sensor);
+            rows.add(row);
+        }
+        Map<String, Object> values = new HashMap<>(settings);
+        values.put("teams", rows);
+        for (String key : LEGACY_KEYS) values.put(key, "");
+        try {
+            host.saveSettings(values);
+            host.log("Gameday moved its team pickers into the Teams list.");
+        } catch (RuntimeException e) {
+            // Safe to carry on: the pickers are still read and merged in, and the next configure tries the move again.
+            host.log("Gameday could not move its team pickers into the Teams list: " + e);
         }
     }
 

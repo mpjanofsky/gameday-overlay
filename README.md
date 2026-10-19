@@ -35,7 +35,7 @@ please open an issue.
 
 ## ✅ Requirements
 
-- Kiosk Satellite 2026.10.13 or newer.
+- Kiosk Satellite 2026.10.23 or newer (the Teams list needs it).
 - Home Assistant with the [TeamTracker](https://github.com/vasqued2/ha-teamtracker) integration and a sensor for each
   team you want to display.
 
@@ -44,7 +44,7 @@ please open an issue.
 1. In Kiosk Satellite open **Plugin Manager**, turn on **Enable Plugins**, then choose **Add plugin**.
 2. Enter this repository's address: `https://github.com/mpjanofsky/gameday-overlay`.
 3. Check the preview, then **Trust and install**.
-4. Turn the plugin on, open its settings and pick your **Team sensor**.
+4. Turn the plugin on, open its settings, tap **Add team** under **Teams** and pick your team's sensor.
 5. To see it right away, set **Preview** to **Live**, then back to **Off**.
 
 Enable the plugin on each kiosk where you want it.
@@ -53,7 +53,7 @@ Enable the plugin on each kiosk where you want it.
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| Team sensor | | Your team's TeamTracker sensor, for example `sensor.tampa_bay_rowdies` |
+| Teams | | Up to six TeamTracker sensors, for example `sensor.tampa_bay_rowdies`. Tap **Add team** to add one and drag rows to set the order. The bar shows one team at a time: a live game first, then a recent final, then an upcoming game. The higher team wins ties, and the team on the bar keeps it until it ends or a higher-ranked game starts. Teams picked in an earlier version move here on their own |
 | Show upcoming game (hours before) | 3 | How long before the start the bar appears. 0 shows it only once the game starts |
 | Keep final score (minutes) | 30 | How long the final score stays up. 0 hides it at the end of the game |
 | Position | Top | Top, Bottom or a corner |
@@ -62,6 +62,11 @@ Enable the plugin on each kiosk where you want it.
 | Size | Medium | Small, Medium or Large |
 | Show over the screensaver | On | Also draw over the screensaver, menu and camera views |
 | Preview | Off | Sample data to try the position and size. Turn off for normal use |
+
+The status line at the top of the plugin's page shows the game on the bar. When nothing is showing, it names the next
+game for the first team in your list. A problem, such as a sensor Home Assistant can't find, replaces it until it's
+fixed. On Kiosk Satellite 2026.10.30 or newer the **Teams** rows show each team's name and icon; older versions show the
+entity ID.
 
 ## 🔒 Privacy
 
@@ -72,7 +77,7 @@ list and the team logos from ESPN. Nothing about you or your kiosk is sent.
 
 | What you see | Check |
 | --- | --- |
-| Nothing shows | A team sensor is picked, the plugin is enabled on this kiosk, and the sensor isn't `NOT_FOUND` or `BYE` |
+| Nothing shows | A team is added under Teams, the plugin is enabled on this kiosk, and the sensor isn't `NOT_FOUND` or `BYE` |
 | Nothing between games | That's the design. Use **Preview** to see it any time |
 | Wrong or missing logo | The bar falls back to text and retries after about 10 minutes |
 | Hidden behind a popup | Notifications, announcements and Lockdown Mode always cover it |

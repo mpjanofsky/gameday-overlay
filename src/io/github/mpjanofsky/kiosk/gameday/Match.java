@@ -34,9 +34,11 @@ final class Match {
     final long kickoff;
     /** When HA last saw the state change, epoch ms, or -1. Resets when HA restarts. */
     final long stateChanged;
+    /** The sensor's friendly name, such as "Tampa Bay Rowdies", or null. Only the plugin's status lists it. */
+    final String name;
 
     private Match(String state, String sport, String league, String team, String opponent, boolean teamIsHome, String teamScore, String opponentScore,
-                  String clock, String eventName, String kickoffIn, long kickoff, long stateChanged) {
+                  String clock, String eventName, String kickoffIn, long kickoff, long stateChanged, String name) {
         this.state = state;
         this.sport = sport;
         this.league = league;
@@ -50,6 +52,7 @@ final class Match {
         this.kickoffIn = kickoffIn;
         this.kickoff = kickoff;
         this.stateChanged = stateChanged;
+        this.name = name;
     }
 
     /** Null unless the snapshot is an available entity with a state. */
@@ -71,7 +74,8 @@ final class Match {
             text(a.get("event_name"), 40),
             text(a.get("kickoff_in"), 24),
             parseTime(text(a.get("date"), 40)),
-            parseTime(text(payload.get("lastChanged"), 40)));
+            parseTime(text(payload.get("lastChanged"), 40)),
+            text(a.get("friendly_name"), 48));
     }
 
     /** Scores arrive as strings or numbers. Whole numbers print without ".0". */

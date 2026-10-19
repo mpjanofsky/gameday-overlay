@@ -23,7 +23,7 @@ except ValueError as error:
 sources = [*sorted((root / 'sdk/src').rglob('*.java')), *sorted((root / 'src').rglob('*.java')), *sorted((root / 'tests').rglob('*.java'))]
 with tempfile.TemporaryDirectory(prefix='gameday-test-') as directory:
     subprocess.run([tool('javac'), '--release', '8', '-nowarn', '-cp', platform, '-d', directory, *map(str, sources)], check=True)
-    for test in ['BugStateTest', 'GamedayPluginTest', 'BrandTest']:
+    for test in ['BugStateTest', 'PickTest', 'GamedayPluginTest', 'BrandTest']:
         # Fixtures are read relative to the repository root.
         subprocess.run([tool('java'), '-ea', '-cp', os.pathsep.join([directory, platform]), 'io.github.mpjanofsky.kiosk.gameday.' + test], check=True, cwd=root)
 

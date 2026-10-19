@@ -2,25 +2,39 @@
   "schemaVersion": 1,
   "id": "gameday",
   "name": "Gameday",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "apiVersion": 1,
   "minAndroidSdk": 24,
   "entryClass": "io.github.mpjanofsky.kiosk.gameday.GamedayPlugin",
   "description": "A small live score bar for your team's game, drawn over the kiosk. Reads a TeamTracker sensor from Home Assistant.",
   "author": "Mike Janofsky",
   "license": "Apache-2.0",
+  "icon": "icon.png",
   "capabilities": [
     "overlay",
     "host.read"
   ],
   "settings": [
     {
-      "key": "teamEntity",
-      "title": "Team sensor",
-      "type": "entity",
-      "default": "",
+      "key": "teams",
+      "title": "Teams",
+      "type": "list",
       "group": "Team",
-      "description": "The TeamTracker sensor for your team, e.g. sensor.tampa_bay_rowdies."
+      "description": "Your teams' TeamTracker sensors, e.g. sensor.tampa_bay_rowdies. The bar shows one team at a time: a live game first, then a recent final, then an upcoming game. Higher in the list wins ties; drag to reorder.",
+      "addTitle": "Add team",
+      "maxItems": 6,
+      "row": {
+        "title": "sensor"
+      },
+      "default": [],
+      "fields": [
+        {
+          "key": "sensor",
+          "type": "entity",
+          "title": "Team sensor",
+          "required": true
+        }
+      ]
     },
     {
       "key": "preGameHours",
@@ -120,6 +134,66 @@
       "default": "Off",
       "group": "Display",
       "description": "Show sample data to try the position and size. Turn off for normal use."
+    },
+    {
+      "key": "teamEntity",
+      "title": "Team sensor",
+      "type": "entity",
+      "default": "",
+      "group": "Team",
+      "description": "Replaced by Teams. A team set here moves there on its own.",
+      "visibleWhen": {
+        "key": "preview",
+        "notEquals": [
+          "Off",
+          "Upcoming game",
+          "Live",
+          "Final",
+          "Final (loss)",
+          "Goal demo",
+          "Sport tour"
+        ]
+      }
+    },
+    {
+      "key": "team2Entity",
+      "title": "Second team sensor",
+      "type": "entity",
+      "default": "",
+      "group": "Team",
+      "description": "Replaced by Teams. A team set here moves there on its own.",
+      "visibleWhen": {
+        "key": "preview",
+        "notEquals": [
+          "Off",
+          "Upcoming game",
+          "Live",
+          "Final",
+          "Final (loss)",
+          "Goal demo",
+          "Sport tour"
+        ]
+      }
+    },
+    {
+      "key": "team3Entity",
+      "title": "Third team sensor",
+      "type": "entity",
+      "default": "",
+      "group": "Team",
+      "description": "Replaced by Teams. A team set here moves there on its own.",
+      "visibleWhen": {
+        "key": "preview",
+        "notEquals": [
+          "Off",
+          "Upcoming game",
+          "Live",
+          "Final",
+          "Final (loss)",
+          "Goal demo",
+          "Sport tour"
+        ]
+      }
     }
   ]
 }
