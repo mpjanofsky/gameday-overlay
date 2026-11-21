@@ -109,6 +109,30 @@ public final class BugStateTest {
         Display atpL = BugState.decide(atpLive, atpKickoff + 15 * MIN, 3, 30);
         assert atpL.kind == Display.Kind.LIVE && atpL.left.equals("ALCARAZ") && atpL.right.equals("SHELTON") && atpL.middle().equals("0–3") && atpL.detail.equals("1. Set") && atpL.teamIsLeft;
         assert atpL.summary().equals("Live: ALCARAZ 0–3 SHELTON 1. Set");
+        // Once a set is over TeamTracker counts it in team_sets_won/opponent_sets_won, while the live
+        // score keeps counting the games of the current set. Same match, start of the 2nd set: Shelton
+        // won the first 6–3, Alcaraz leads 6–3 in games. Without the sets the bar reads like a lead.
+        Map<String, Object> sets = Json.file("fixtures/teamtracker/atp-in.json");
+        Map<String, Object> setsAttrs = (Map<String, Object>) sets.get("attributes");
+        setsAttrs.put("clock", "2. Set");
+        setsAttrs.put("team_score", 6);
+        setsAttrs.put("opponent_score", 3);
+        setsAttrs.put("team_sets_won", "0");
+        setsAttrs.put("opponent_sets_won", "1");
+        Match atpSets = Match.from(sets);
+        assert atpSets.teamSets.equals("0") && atpSets.opponentSets.equals("1") : atpSets.teamSets + " " + atpSets.opponentSets;
+        Display atpSet2 = BugState.decide(atpSets, atpKickoff + 74 * MIN, 3, 30);
+        assert atpSet2.kind == Display.Kind.LIVE && atpSet2.middle().equals("6–3") && atpSet2.detail.equals("S 0–1 · 2. Set") : atpSet2.summary();
+        assert atpSet2.summary().equals("Live: ALCARAZ 6–3 SHELTON S 0–1 · 2. Set");
+        // Nothing won yet, and the counts arrive as numbers here: the clock stays on its own.
+        Map<String, Object> first = Json.file("fixtures/teamtracker/atp-in.json");
+        Map<String, Object> firstAttrs = (Map<String, Object>) first.get("attributes");
+        firstAttrs.put("team_sets_won", 0);
+        firstAttrs.put("opponent_sets_won", 0);
+        assert BugState.decide(Match.from(first), atpKickoff + 15 * MIN, 3, 30).detail.equals("1. Set") : "no set won yet keeps the clock plain";
+        assert atpL.detail.equals("1. Set") : "a sensor without the counts keeps the clock plain";
+        // Only tennis reads them: the soccer live snapshot has no sets and its clock stays untouched.
+        assert BugState.decide(live, kickoff + 70 * MIN, 3, 30).detail.equals("67'");
 
         // Soccer, recorded from HA history: the 2026-10-10 away match at INDY (TBR won 3-1).
         long indyKickoff = Match.parseTime("2026-10-10T23:00Z");

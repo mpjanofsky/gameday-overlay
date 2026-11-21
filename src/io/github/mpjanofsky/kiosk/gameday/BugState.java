@@ -57,7 +57,7 @@ final class BugState {
                 return new Display(Display.Kind.NEXT, left, right, "", "", teamLeft, m.kickoff, minutes, "");
             }
             case Match.IN:
-                return new Display(Display.Kind.LIVE, left, right, leftScore, rightScore, teamLeft, -1, 0, m.clock == null ? "LIVE" : m.clock);
+                return new Display(Display.Kind.LIVE, left, right, leftScore, rightScore, teamLeft, -1, 0, liveDetail(m, teamLeft));
             case Match.POST: {
                 long ended = endedAt(m);
                 if (ended < 0 || finalMinutes <= 0 || now >= ended + finalMinutes * 60_000L) return Display.HIDDEN;
@@ -81,6 +81,33 @@ final class BugState {
     }
 
     private static String score(String s) { return s == null ? "–" : s; }
+
+    /**
+     * The capsule text during a live match. For every other sport that is the clock as TeamTracker
+     * prints it. Tennis is the exception: its live score is the games of the current set, so the sets
+     * won would be invisible, and "6–3 in the 2nd Set" reads like a match lead even when the opponent
+     * leads one set to none. Once a set is over, its count joins the clock: "S 0–1 · 2. Set".
+     * No count, or none won yet, leaves the clock on its own.
+     */
+    static String liveDetail(Match m, boolean teamLeft) {
+        String clock = m.clock == null ? "LIVE" : m.clock;
+        if (!"tennis".equals(m.sport)) return clock;
+        int mine = setsWon(teamLeft ? m.teamSets : m.opponentSets);
+        int theirs = setsWon(teamLeft ? m.opponentSets : m.teamSets);
+        if (mine < 0 || theirs < 0 || (mine == 0 && theirs == 0)) return clock;
+        return "S " + mine + "–" + theirs + " · " + clock;
+    }
+
+    /** -1 when TeamTracker sent no usable count, so an odd value never reaches the bar. */
+    private static int setsWon(String s) {
+        if (s == null) return -1;
+        try {
+            int n = Integer.parseInt(s.trim());
+            return n < 0 ? -1 : n;
+        } catch (NumberFormatException notANumber) {
+            return -1;
+        }
+    }
 
     /**
      * TeamTracker's POST clock is FT/AET for soccer and "Final" (or "Final/OT") elsewhere.

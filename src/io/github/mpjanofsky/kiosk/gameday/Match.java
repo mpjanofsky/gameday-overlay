@@ -27,6 +27,9 @@ final class Match {
     final boolean teamIsHome;
     final String teamScore;
     final String opponentScore;
+    /** Tennis only: sets already won. For the other sports TeamTracker leaves these out, so they are null. */
+    final String teamSets;
+    final String opponentSets;
     final String clock;
     final String eventName;
     final String kickoffIn;
@@ -38,7 +41,7 @@ final class Match {
     final String name;
 
     private Match(String state, String sport, String league, String team, String opponent, boolean teamIsHome, String teamScore, String opponentScore,
-                  String clock, String eventName, String kickoffIn, long kickoff, long stateChanged, String name) {
+                  String teamSets, String opponentSets, String clock, String eventName, String kickoffIn, long kickoff, long stateChanged, String name) {
         this.state = state;
         this.sport = sport;
         this.league = league;
@@ -47,6 +50,8 @@ final class Match {
         this.teamIsHome = teamIsHome;
         this.teamScore = teamScore;
         this.opponentScore = opponentScore;
+        this.teamSets = teamSets;
+        this.opponentSets = opponentSets;
         this.clock = clock;
         this.eventName = eventName;
         this.kickoffIn = kickoffIn;
@@ -84,6 +89,8 @@ final class Match {
             !"away".equals(a.get("team_homeaway")),
             text(a.get("team_score"), 3),
             text(a.get("opponent_score"), 3),
+            text(a.get("team_sets_won"), 2),
+            text(a.get("opponent_sets_won"), 2),
             text(a.get("clock"), 24),
             text(a.get("event_name"), 40),
             text(a.get("kickoff_in"), 24),

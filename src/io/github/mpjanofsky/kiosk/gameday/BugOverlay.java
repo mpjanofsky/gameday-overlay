@@ -269,9 +269,13 @@ final class BugOverlay implements OverlayFactory {
         int gap = t.px(Math.max(4, textSp / 3f));
         detail.setCompoundDrawablePadding(gap);
         // While live the capsule is as wide as it will be during a goal, so the bar does not jump when GOAL appears.
+        // Tennis adds the sets won to the clock once a set is over, so that text is measured too.
         if (d.kind == Display.Kind.LIVE) {
             int dotWidth = dot == null ? 0 : dot.getBounds().width();
-            int width = (int) Math.ceil(detail.getPaint().measureText((d.left.length() > d.right.length() ? d.left : d.right) + " " + GamedayPlugin.goalWord(d.sport))) + dotWidth + glyph.getIntrinsicWidth() + 2 * gap + 2 * h;
+            String name = d.left.length() > d.right.length() ? d.left : d.right;
+            String goal = name + " " + GamedayPlugin.goalWord(d.sport);
+            float textWidth = Math.max(detail.getPaint().measureText(goal), detail.getPaint().measureText(d.detail));
+            int width = (int) Math.ceil(textWidth) + dotWidth + glyph.getIntrinsicWidth() + 2 * gap + 2 * h;
             detail.setMinWidth(width);
             detail.setMinimumWidth(width);
         } else {
