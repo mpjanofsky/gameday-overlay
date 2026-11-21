@@ -23,7 +23,7 @@ final class BugState {
             case "soccer": case "basketball": return 3 * HOUR_MS;
             case "hockey": return 7 * HOUR_MS / 2;
             case "football": return 4 * HOUR_MS;
-            case "baseball": return 5 * HOUR_MS;
+            case "baseball": case "tennis": return 5 * HOUR_MS; // a tennis match has no ceiling: long ones run past four hours
             default: return 5 * HOUR_MS;
         }
     }

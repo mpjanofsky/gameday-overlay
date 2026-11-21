@@ -267,6 +267,8 @@ public final class GamedayPlugin implements KioskPlugin {
     static String goalWord(String sport) {
         if ("soccer".equals(sport) || "hockey".equals(sport)) return "GOAL";
         if ("baseball".equals(sport)) return "RUN";
+        // In tennis TeamTracker's live score is the games of the current set, so the rising score is a game.
+        if ("tennis".equals(sport)) return "GAME";
         return "SCORE";
     }
 
@@ -357,8 +359,8 @@ public final class GamedayPlugin implements KioskPlugin {
         return "Waiting for " + (configured() == 1 ? "the team sensor" : "the team sensors") + ".";
     }
 
-    private static final String[] TOUR = {"soccer", "baseball", "hockey", "football"};
-    private static final String[] TOUR_CLOCK = {"67'", "Top 7th", "2nd 12:30", "Q3 5:12"};
+    private static final String[] TOUR = {"soccer", "baseball", "hockey", "football", "tennis"};
+    private static final String[] TOUR_CLOCK = {"67'", "Top 7th", "2nd 12:30", "Q3 5:12", "2nd Set"};
 
     private String previewSport(long now) {
         return "Sport tour".equals(preview) ? TOUR[(int) ((now - previewSince) / 12_000) % TOUR.length] : "soccer";

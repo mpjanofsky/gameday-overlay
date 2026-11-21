@@ -31,14 +31,14 @@ from a gitignored `.local/LOCAL.md`.
 
 Logos, colors and game data work for any sport TeamTracker reports, because the league comes from the sensor. What
 differs per sport is a handful of small rules, each a one- or two-line `switch` or `if`, keyed on TeamTracker's
-lowercase `sport` value (`soccer`, `baseball`, `hockey`, `football`, `basketball`):
+lowercase `sport` value (`soccer`, `baseball`, `hockey`, `football`, `basketball`, `tennis`):
 
 | Rule | Where | What it does |
 | --- | --- | --- |
 | Reading order | `BugState.awayFirst` | US sports read "away @ home", so the away team goes on the left. Soccer, and any sport not listed, reads home first |
 | Game length | `BugState.spanMs` | How long after the start a game can run before a stale sensor is treated as over |
 | Final label | `BugState.finalLabel` | `FT` for soccer, `Final` for everything else, unless TeamTracker's own text is short enough to use |
-| Scoring word | `GamedayPlugin.goalWord` | `GOAL`, `RUN` or `SCORE` while your team's celebration shows |
+| Scoring word | `GamedayPlugin.goalWord` | `GOAL`, `RUN`, `GAME` or `SCORE` while your team's celebration shows |
 | Icon | `Ball` | A few shapes drawn in code, so the plugin ships no image files. Unknown sports get the soccer ball |
 | Preview tour | `GamedayPlugin.TOUR` | The sports shown by the **Sport tour** preview |
 

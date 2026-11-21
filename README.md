@@ -29,6 +29,7 @@ announcements still cover it while they're up.
 | Hockey | ✅ | |
 | Football | ✅ | |
 | Basketball | ✅ | |
+| Tennis | ✅ | ✅ |
 
 "Tested" means checked with a real live game on a kiosk. If something looks off in a sport that isn't tested yet,
 please open an issue.

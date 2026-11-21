@@ -93,6 +93,23 @@ public final class BugStateTest {
         assert nhlNext.left.equals("TB") && nhlNext.right.equals("NYR") && nhlNext.minutesToKickoff == 120;
         assert BugState.spanMs(Match.from(missingSport(mlb))) == 5 * HOUR : "unknown sport uses the longest span";
 
+        // Tennis: recorded from sensor.atp_alcaraz on 2026-11-21, the ATP Finals semifinal ALCARAZ v SHELTON.
+        // A tennis "team" is a player: the surname is longer than the usual six characters and must survive.
+        Match atp = Match.from(Json.file("fixtures/teamtracker/atp-pre.json"));
+        assert atp.sport.equals("tennis") && atp.league.equals("atp") && atp.team.equals("ALCARAZ") && atp.teamIsHome;
+        long atpKickoff = Match.parseTime("2026-11-21T13:40Z");
+        assert atp.kickoff == atpKickoff && BugState.spanMs(atp) == 5 * HOUR;
+        assert !BugState.awayFirst("tennis") : "tennis is neutral ground, the tracked player goes first";
+        Display atpNext = BugState.decide(atp, atpKickoff - 2 * HOUR, 3, 30);
+        assert atpNext.kind == Display.Kind.NEXT && atpNext.left.equals("ALCARAZ") && atpNext.right.equals("SHELTON") : atpNext.summary();
+        // Recorded live mid-match: TeamTracker prints the games of the current set and names the
+        // opponent only by full name, so the surname has to survive as the opponent's label.
+        Match atpLive = Match.from(Json.file("fixtures/teamtracker/atp-in.json"));
+        assert atpLive.state.equals(Match.IN) && atpLive.opponent.equals("SHELTON") : atpLive.opponent;
+        Display atpL = BugState.decide(atpLive, atpKickoff + 15 * MIN, 3, 30);
+        assert atpL.kind == Display.Kind.LIVE && atpL.left.equals("ALCARAZ") && atpL.right.equals("SHELTON") && atpL.middle().equals("0–3") && atpL.detail.equals("1. Set") && atpL.teamIsLeft;
+        assert atpL.summary().equals("Live: ALCARAZ 0–3 SHELTON 1. Set");
+
         // Soccer, recorded from HA history: the 2026-10-10 away match at INDY (TBR won 3-1).
         long indyKickoff = Match.parseTime("2026-10-10T23:00Z");
         Display firstHalf = BugState.decide(Match.from(Json.file("fixtures/teamtracker/rowdies-in-29.json")), indyKickoff + 36 * MIN, 3, 30);
