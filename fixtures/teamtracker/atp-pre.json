@@ -1,0 +1,22 @@
+{
+  "_source": "Recorded from sensor.atp_alcaraz on 2026-11-21 (TeamTracker, ESPN atp). Trimmed to the attributes the plugin reads.",
+  "status": "available",
+  "state": "PRE",
+  "lastChanged": "2026-11-21T12:33:16.920622+00:00",
+  "attributes": {
+    "state": "PRE",
+    "sport": "tennis",
+    "league_path": "atp",
+    "team_abbr": "ALCARAZ",
+    "opponent_abbr": null,
+    "opponent_name": "Ben Shelton",
+    "event_name": "Nitto ATP Finals",
+    "date": "2026-11-21T13:40Z",
+    "kickoff_in": "in 22 Minuten",
+    "team_homeaway": null,
+    "team_score": null,
+    "opponent_score": null,
+    "clock": "Sa., November 21. at 8:40 AM EST",
+    "friendly_name": "ATP - Alcaraz"
+  }
+}

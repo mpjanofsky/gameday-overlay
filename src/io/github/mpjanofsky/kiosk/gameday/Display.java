@@ -30,7 +30,7 @@ final class Display {
     /** ESPN colors and logos, or null while unknown or not fetched. */
     final Brand leftBrand;
     final Brand rightBrand;
-    /** TeamTracker's sport (soccer, baseball, hockey, football), or null. Picks the ball and the goal word. */
+    /** TeamTracker's sport (soccer, baseball, hockey, football, tennis), or null. Picks the ball and the goal word. */
     final String sport;
 
     Display(Kind kind, String left, String right, String leftScore, String rightScore, boolean teamIsLeft,

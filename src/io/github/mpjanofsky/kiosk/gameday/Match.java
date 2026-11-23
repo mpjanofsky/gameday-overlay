@@ -18,7 +18,7 @@ final class Match {
     static final String POST = "POST";
 
     final String state;
-    /** TeamTracker's lowercase sport (soccer, baseball, hockey, football), or null. */
+    /** TeamTracker's lowercase sport (soccer, baseball, hockey, football, tennis), or null. */
     final String sport;
     /** TeamTracker's league_path, e.g. usa.usl.1 or mlb. Part of ESPN's team-list URL, so BrandStore checks it. */
     final String league;
@@ -27,6 +27,9 @@ final class Match {
     final boolean teamIsHome;
     final String teamScore;
     final String opponentScore;
+    /** Tennis only: sets already won. For the other sports TeamTracker leaves these out, so they are null. */
+    final String teamSets;
+    final String opponentSets;
     final String clock;
     final String eventName;
     final String kickoffIn;
@@ -38,7 +41,7 @@ final class Match {
     final String name;
 
     private Match(String state, String sport, String league, String team, String opponent, boolean teamIsHome, String teamScore, String opponentScore,
-                  String clock, String eventName, String kickoffIn, long kickoff, long stateChanged, String name) {
+                  String teamSets, String opponentSets, String clock, String eventName, String kickoffIn, long kickoff, long stateChanged, String name) {
         this.state = state;
         this.sport = sport;
         this.league = league;
@@ -47,6 +50,8 @@ final class Match {
         this.teamIsHome = teamIsHome;
         this.teamScore = teamScore;
         this.opponentScore = opponentScore;
+        this.teamSets = teamSets;
+        this.opponentSets = opponentSets;
         this.clock = clock;
         this.eventName = eventName;
         this.kickoffIn = kickoffIn;
@@ -62,14 +67,30 @@ final class Match {
         if (state == null) return null;
         Map<?, ?> a = payload.get("attributes") instanceof Map ? (Map<?, ?>) payload.get("attributes") : java.util.Collections.emptyMap();
         String sport = text(a.get("sport"), 16);
+        String sportLower = sport == null ? null : sport.toLowerCase(java.util.Locale.ROOT);
+        // Team abbreviations are short, but a tennis "team" is a player and ESPN prints surnames
+        // (ALCARAZ, SHELTON), so tennis keeps a few more characters of them.
+        int abbrMax = "tennis".equals(sportLower) ? 8 : 6;
+        String opponentAbbr = text(a.get("opponent_abbr"), abbrMax);
+        if (opponentAbbr == null && "tennis".equals(sportLower)) {
+            // ESPN names the abbreviation only for the player the sensor tracks, never for the
+            // opponent, so read the opponent's surname from their name instead ("Ben Shelton" -> "SHELTON").
+            String name = text(a.get("opponent_name"), 40);
+            if (name != null) {
+                int space = name.lastIndexOf(' ');
+                opponentAbbr = text(space < 0 ? name : name.substring(space + 1), abbrMax).toUpperCase(java.util.Locale.ROOT);
+            }
+        }
         return new Match(state.toUpperCase(java.util.Locale.ROOT),
-            sport == null ? null : sport.toLowerCase(java.util.Locale.ROOT),
+            sportLower,
             text(a.get("league_path"), 24),
-            orDash(text(a.get("team_abbr"), 6)),
-            orDash(text(a.get("opponent_abbr"), 6)),
+            orDash(text(a.get("team_abbr"), abbrMax)),
+            orDash(opponentAbbr),
             !"away".equals(a.get("team_homeaway")),
             text(a.get("team_score"), 3),
             text(a.get("opponent_score"), 3),
+            text(a.get("team_sets_won"), 2),
+            text(a.get("opponent_sets_won"), 2),
             text(a.get("clock"), 24),
             text(a.get("event_name"), 40),
             text(a.get("kickoff_in"), 24),

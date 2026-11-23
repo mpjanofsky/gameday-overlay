@@ -62,6 +62,11 @@ final class Crest extends View {
             paint.setTextAlign(Paint.Align.CENTER);
             paint.setFakeBoldText(true);
             paint.setTextSize(s * (label.length() > 3 ? 0.26f : 0.32f));
+            // A label longer than the disc, such as a tennis player's surname, shrinks to fit
+            // inside the ring instead of being clipped at its edge.
+            float fit = s - 2 * stroke - s * 0.1f;
+            float measured = paint.measureText(label);
+            if (measured > fit) paint.setTextSize(paint.getTextSize() * fit / measured);
             c.drawText(label, s / 2, s / 2 - (paint.descent() + paint.ascent()) / 2, paint);
             paint.setFakeBoldText(false);
         }

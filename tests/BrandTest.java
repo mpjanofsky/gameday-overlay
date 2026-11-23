@@ -48,7 +48,7 @@ public final class BrandTest {
         assert GamedayPlugin.scorer(one, new Display(Display.Kind.LIVE, "TBR", "DET", "0", "0", true, -1, 0, "11'")) == 0; // a correction down
         assert GamedayPlugin.scorer(one, new Display(Display.Kind.LIVE, "TBR", "PIT", "2", "0", true, -1, 0, "11'")) == 0;
         assert GamedayPlugin.scorer(Display.HIDDEN, one) == 0;
-        assert GamedayPlugin.goalWord("soccer").equals("GOAL") && GamedayPlugin.goalWord("baseball").equals("RUN") && GamedayPlugin.goalWord(null).equals("SCORE");
+        assert GamedayPlugin.goalWord("soccer").equals("GOAL") && GamedayPlugin.goalWord("baseball").equals("RUN") && GamedayPlugin.goalWord("tennis").equals("GAME") && GamedayPlugin.goalWord(null).equals("SCORE");
 
         // Only the user's own team celebrates: the left score rising counts when the team is on the left, and so on.
         assert GamedayPlugin.celebrates(1, true) && !GamedayPlugin.celebrates(-1, true);

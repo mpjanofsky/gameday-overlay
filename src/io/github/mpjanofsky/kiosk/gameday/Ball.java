@@ -44,6 +44,7 @@ final class Ball extends Drawable {
         if ("baseball".equals(sport)) baseball(c, r);
         else if ("hockey".equals(sport)) puck(c, r);
         else if ("football".equals(sport)) football(c, r);
+        else if ("tennis".equals(sport)) tennis(c, r);
         else soccer(c, r);
         c.restore();
     }
@@ -150,5 +151,26 @@ final class Ball extends Drawable {
         stroke(RIM, rim);
         box.set(-r + rim / 2f, -h + rim / 2f, r - rim / 2f, h - rim / 2f);
         c.drawOval(box, paint);
+    }
+
+    private void tennis(Canvas c, float r) {
+        fill(0xFFD7E626); // optic yellow, the color of a tennis ball
+        c.drawCircle(0, 0, r, paint);
+        // The seam: two curves hugging the sides, drawn by circles centered outside the
+        // ball, like the baseball's stitching. A tennis seam reaches deeper toward the
+        // middle, so these centers sit closer and the circles are larger.
+        c.save();
+        path.reset();
+        path.addCircle(0, 0, r, Path.Direction.CW);
+        c.clipPath(path);
+        stroke(0xFFFFFFFF, Math.max(1.5f, r * 0.14f));
+        c.drawCircle(-r * 1.25f, 0, r * 1.3f, paint);
+        c.drawCircle(r * 1.25f, 0, r * 1.3f, paint);
+        c.restore();
+        // The pale balls get the light RIM ring; on optic yellow it would only blur, so the
+        // edge is a darker olive that keeps the silhouette round on the dark capsule.
+        float rim = rimWidth(r);
+        stroke(0xFF82911E, rim);
+        c.drawCircle(0, 0, r - rim / 2f, paint);
     }
 }
