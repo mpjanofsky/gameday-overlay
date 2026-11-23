@@ -77,8 +77,12 @@ final class Match {
             // opponent, so read the opponent's surname from their name instead ("Ben Shelton" -> "SHELTON").
             String name = text(a.get("opponent_name"), 40);
             if (name != null) {
+                // text() cuts at 40 characters without trimming again, so a long name (a doubles pair) can
+                // end in a space, and the part after it is empty. Trimming keeps a label instead of failing.
+                name = name.trim();
                 int space = name.lastIndexOf(' ');
-                opponentAbbr = text(space < 0 ? name : name.substring(space + 1), abbrMax).toUpperCase(java.util.Locale.ROOT);
+                String surname = text(space < 0 ? name : name.substring(space + 1), abbrMax);
+                if (surname != null) opponentAbbr = surname.toUpperCase(java.util.Locale.ROOT);
             }
         }
         return new Match(state.toUpperCase(java.util.Locale.ROOT),

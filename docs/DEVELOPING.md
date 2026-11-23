@@ -43,11 +43,11 @@ lowercase `sport` value (`soccer`, `baseball`, `hockey`, `football`, `basketball
 | Icon | `Ball` | A few shapes drawn in code, so the plugin ships no image files. Unknown sports get the soccer ball |
 | Preview tour | `GamedayPlugin.TOUR` | The sports shown by the **Sport tour** preview |
 
-![Soccer ball, baseball, hockey puck and football as drawn in the clock capsule](sport-icons.png)
+![Soccer ball, baseball, hockey puck, football, basketball and tennis ball as drawn in the clock capsule](sport-icons.png)
 
 To add one: add the cases above, add a fixture under `fixtures/teamtracker/` and a test for its rules, then run
-`scripts/check.sh` and try it with the **Sport tour** preview on a kiosk. Basketball is supported but still uses the
-soccer ball and the plain `SCORE` word, so it is a good first one to finish.
+`scripts/check.sh` and try it with the **Sport tour** preview on a kiosk. Basketball has its own ball and uses the plain
+`SCORE` word.
 
 Real live game snapshots make the best fixtures. Home Assistant's history keeps full attributes for about ten days, so
 save them soon after the game.

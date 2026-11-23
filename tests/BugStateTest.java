@@ -82,6 +82,9 @@ public final class BugStateTest {
         ((Map<String, Object>) ot.get("attributes")).put("clock", "Final/Overtime");
         assert BugState.decide(Match.from(ot), nflKickoff + 3 * HOUR + 10 * MIN, 3, 30).detail.equals("Final") : "long text falls back";
 
+        ((Map<String, Object>) ot.get("attributes")).put("clock", "Final/2OT");
+        assert BugState.decide(Match.from(ot), nflKickoff + 3 * HOUR + 10 * MIN, 3, 30).detail.equals("Final/2OT") : "double overtime kept";
+
         Match mlb = Match.from(Json.file("fixtures/teamtracker/mlb-pre.json"));
         Match nhl = Match.from(Json.file("fixtures/teamtracker/nhl-pre.json"));
         assert mlb.sport.equals("baseball") && mlb.teamIsHome && BugState.spanMs(mlb) == 5 * HOUR;
@@ -133,6 +136,21 @@ public final class BugStateTest {
         assert atpL.detail.equals("1. Set") : "a sensor without the counts keeps the clock plain";
         // Only tennis reads them: the soccer live snapshot has no sets and its clock stays untouched.
         assert BugState.decide(live, kickoff + 70 * MIN, 3, 30).detail.equals("67'");
+        // At POST TeamTracker (set_tennis.py) replaces the scores with the sets won, so the final card
+        // reads the match result, not the last set's games. Synthetic: Shelton won 2-1 in sets.
+        Map<String, Object> done = Json.file("fixtures/teamtracker/atp-in.json");
+        Map<String, Object> doneAttrs = (Map<String, Object>) done.get("attributes");
+        done.put("lastChanged", "2026-11-21T15:55:00+00:00");
+        done.put("state", "POST");
+        doneAttrs.put("state", "POST");
+        doneAttrs.put("clock", "Final");
+        doneAttrs.put("team_score", "1");
+        doneAttrs.put("opponent_score", "2");
+        Display atpFinal = BugState.decide(Match.from(done), Match.parseTime("2026-11-21T16:00Z"), 3, 30);
+        assert atpFinal.kind == Display.Kind.FINAL && atpFinal.middle().equals("1–2") && atpFinal.detail.equals("Final") : atpFinal.summary();
+        // A long name cut at 40 characters can end in a space; that used to crash Match.from.
+        doneAttrs.put("opponent_name", "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa Bbbbbbb");
+        assert Match.from(done).opponent.equals("AAAAAAAA") : Match.from(done).opponent;
 
         // Soccer, recorded from HA history: the 2026-10-10 away match at INDY (TBR won 3-1).
         long indyKickoff = Match.parseTime("2026-10-10T23:00Z");

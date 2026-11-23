@@ -30,7 +30,10 @@ final class Ball extends Drawable {
     @Override public int getIntrinsicWidth() { return size; }
     @Override public int getIntrinsicHeight() { return size; }
     @Override public void draw(Canvas c) {
-        draw(c, sport, getBounds().exactCenterX(), getBounds().exactCenterY(), size / 2f, 0f);
+        // A football is a long oval inside the same square as a round ball, so it looked smaller than the others.
+        // Let it run a little wider than the box (a drawable does not clip itself) to match their visual weight.
+        float scale = "football".equals(sport) ? 1.2f : 1f;
+        draw(c, sport, getBounds().exactCenterX(), getBounds().exactCenterY(), size / 2f * scale, 0f);
     }
     @Override public void setAlpha(int alpha) { paint.setAlpha(alpha); }
     @Override public void setColorFilter(ColorFilter filter) { paint.setColorFilter(filter); }
@@ -44,6 +47,7 @@ final class Ball extends Drawable {
         if ("baseball".equals(sport)) baseball(c, r);
         else if ("hockey".equals(sport)) puck(c, r);
         else if ("football".equals(sport)) football(c, r);
+        else if ("basketball".equals(sport)) basketball(c, r);
         else if ("tennis".equals(sport)) tennis(c, r);
         else soccer(c, r);
         c.restore();
@@ -134,6 +138,25 @@ final class Ball extends Drawable {
         stroke(RIM, rim);
         box.set(-r + rim / 2f, -h + rim / 2f, r - rim / 2f, h - rim / 2f);
         c.drawOval(box, paint);
+    }
+
+    private void basketball(Canvas c, float r) {
+        fill(0xFFE8782A);
+        c.drawCircle(0, 0, r, paint);
+        // Dark seams: one vertical, one horizontal, and two arcs bowing in from the sides, clipped to the ball.
+        c.save();
+        path.reset();
+        path.addCircle(0, 0, r, Path.Direction.CW);
+        c.clipPath(path);
+        stroke(0xFF3A1A08, Math.max(1f, r * 0.11f));
+        c.drawLine(0, -r, 0, r, paint);
+        c.drawLine(-r, 0, r, 0, paint);
+        c.drawCircle(-r * 1.55f, 0, r * 0.95f, paint);
+        c.drawCircle(r * 1.55f, 0, r * 0.95f, paint);
+        c.restore();
+        float rim = rimWidth(r);
+        stroke(RIM, rim);
+        c.drawCircle(0, 0, r - rim / 2f, paint);
     }
 
     private void football(Canvas c, float r) {

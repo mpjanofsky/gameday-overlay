@@ -359,8 +359,8 @@ public final class GamedayPlugin implements KioskPlugin {
         return "Waiting for " + (configured() == 1 ? "the team sensor" : "the team sensors") + ".";
     }
 
-    private static final String[] TOUR = {"soccer", "baseball", "hockey", "football", "tennis"};
-    private static final String[] TOUR_CLOCK = {"67'", "Top 7th", "2nd 12:30", "Q3 5:12", "2nd Set"};
+    private static final String[] TOUR = {"soccer", "baseball", "hockey", "football", "basketball", "tennis"};
+    private static final String[] TOUR_CLOCK = {"67'", "Top 7th", "2nd 12:30", "Q3 5:12", "Q2 3:45", "2nd Set"};
 
     private String previewSport(long now) {
         return "Sport tour".equals(preview) ? TOUR[(int) ((now - previewSince) / 12_000) % TOUR.length] : "soccer";

@@ -110,12 +110,12 @@ final class BugState {
     }
 
     /**
-     * TeamTracker's POST clock is FT/AET for soccer and "Final" (or "Final/OT") elsewhere.
+     * TeamTracker's POST clock is FT/AET for soccer and "Final" (or "Final/OT", "Final/2OT") elsewhere.
      * Long text falls back to the sport's plain final label.
      */
     private static String finalLabel(Match m) {
         String clock = m.clock;
-        if (clock != null && clock.length() <= 8) return clock;
+        if (clock != null && clock.length() <= 10) return clock;
         return "soccer".equals(m.sport) ? "FT" : "Final";
     }
 }

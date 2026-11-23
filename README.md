@@ -26,13 +26,13 @@ announcements still cover it while they're up.
 | --- | :---: | :---: |
 | Soccer | ✅ | ✅ |
 | Baseball | ✅ | ✅ |
-| Hockey | ✅ | |
+| Hockey | ✅ | ✅ |
 | Football | ✅ | |
 | Basketball | ✅ | |
-| Tennis | ✅ | ✅ |
+| Tennis | ✅ | ✅ * |
 
-"Tested" means checked with a real live game on a kiosk. If something looks off in a sport that isn't tested yet,
-please open an issue.
+"Tested" means checked with a real live game on a kiosk. \* Tennis was tested by a contributor on their own kiosk
+during the 2026 ATP Finals. If something looks off in a sport that isn't tested yet, please open an issue.
 
 ## ✅ Requirements
 
@@ -41,6 +41,16 @@ please open an issue.
   team you want to display.
 
 ## 📲 Install
+
+### Community Plugins (Recommended)
+
+Gameday is listed in [Community Plugins](https://kiosksatellite.com/plugins/). Use the button below to open it in your Kiosk Satellite and install it.
+
+[![Install in Kiosk Satellite](https://kiosksatellite.com/img/badges/plugin-add.svg)](https://kiosksatellite.com/redirect/plugin/?repository=mpjanofsky/gameday-overlay)
+
+Or search for `Gameday` in **Settings > Plugin Manager > Browse plugins**.
+
+### Manual
 
 1. In Kiosk Satellite open **Plugin Manager**, turn on **Enable Plugins**, then choose **Add plugin**.
 2. Enter this repository's address: `https://github.com/mpjanofsky/gameday-overlay`.
